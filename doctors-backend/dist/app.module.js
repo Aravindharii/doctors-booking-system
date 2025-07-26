@@ -14,6 +14,7 @@ const users_module_1 = require("./users/users.module");
 const auth_module_1 = require("./auth/auth.module");
 const slots_module_1 = require("./slots/slots.module");
 const appointments_module_1 = require("./appointments/appointments.module");
+const doctors_module_1 = require("./doctors/doctors.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,6 +26,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             slots_module_1.SlotsModule,
+            doctors_module_1.DoctorsModule,
             appointments_module_1.AppointmentsModule,
         ],
     })

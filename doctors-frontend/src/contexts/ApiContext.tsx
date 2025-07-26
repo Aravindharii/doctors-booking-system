@@ -2,13 +2,22 @@ import { createContext, useContext, PropsWithChildren } from 'react'
 import axios, { AxiosInstance } from 'axios'
 import { BACKEND_URL } from '../utils/config'
 import { useAuth } from './AuthContext'
-import { Appointment, AppointmentStatus, AuthResponse, Role, Slot, User } from '../types'
+import {
+  Appointment,
+  AppointmentStatus,
+  Role,
+  Slot,
+  User,
+  Doctor, // 👈 add this to your src/types.ts and import it
+} from '../types'
 
 interface ApiContextType {
   api: AxiosInstance
   login: (email: string, password: string) => Promise<AuthResponse>
   register: (name: string, email: string, password: string, role: Role) => Promise<AuthResponse>
   getMe: () => Promise<User>
+  /** 👇 NEW */
+  getDoctors: () => Promise<Doctor[]>
   createSlot: (start: string, end: string) => Promise<Slot>
   getMySlots: () => Promise<Slot[]>
   updateSlot: (id: number, start?: string, end?: string, isBooked?: boolean) => Promise<Slot>
@@ -43,6 +52,12 @@ export function ApiProvider({ children }: PropsWithChildren) {
 
   const getMe = async () => {
     const response = await api.get<User>('/auth/me')
+    return response.data
+  }
+
+  /** 👇 NEW */
+  const getDoctors = async () => {
+    const response = await api.get<Doctor[]>('/doctors')
     return response.data
   }
 
@@ -103,6 +118,7 @@ export function ApiProvider({ children }: PropsWithChildren) {
         login,
         register,
         getMe,
+        getDoctors, // 👈 expose it
         createSlot,
         getMySlots,
         updateSlot,

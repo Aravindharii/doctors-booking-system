@@ -24,4 +24,13 @@ export class UsersService {
   findById(id: number) {
     return this.prisma.user.findUnique({ where: { id } });
   }
+
+  /** 👇 NEW */
+  async findAllDoctors() {
+    return this.prisma.user.findMany({
+      where: { role: Role.DOCTOR },
+      select: { id: true, name: true },
+      orderBy: { name: 'asc' },
+    });
+  }
 }

@@ -30,4 +30,8 @@ export declare class UsersService {
         createdAt: Date;
         updatedAt: Date;
     } | null, null, import("@prisma/client/runtime/library").DefaultArgs, import(".prisma/client").Prisma.PrismaClientOptions>;
+    findAllDoctors(): Promise<{
+        id: number;
+        name: string;
+    }[]>;
 }

@@ -1,14 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useApi } from '../../contexts/ApiContext'
 import Button from '../../components/ui/Button'
-import Input from '../../components/ui/Input'
+import { Doctor, Slot } from '../../types'
 
 export default function PatientBook() {
-  const [doctorId, setDoctorId] = useState<number>(1)
-  const [slots, setSlots] = useState<any[]>([])
-  const [selected, setSelected] = useState<number>()
+  const [doctorId, setDoctorId] = useState<number | undefined>()
+  const [doctors, setDoctors] = useState<Doctor[]>([])
+  const [slots, setSlots] = useState<Slot[]>([])
+  const [selected, setSelected] = useState<number | undefined>()
   const [isFetching, setIsFetching] = useState(false)
-  const { getAvailableSlots, bookAppointment } = useApi()
+
+  const { getDoctors, getAvailableSlots, bookAppointment } = useApi()
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const list = await getDoctors()
+        setDoctors(list)
+        if (list.length) setDoctorId(list[0].id)
+      } catch (err: any) {
+        alert(err?.response?.data?.message || 'Failed to load doctors')
+      }
+    }
+    load()
+  }, [getDoctors])
 
   const fetchSlots = async () => {
     if (!doctorId) return
@@ -16,21 +31,22 @@ export default function PatientBook() {
     try {
       const data = await getAvailableSlots(doctorId)
       setSlots(data)
-    } catch (e: any) {
-      alert(e?.response?.data?.message || 'Failed to load slots')
+      setSelected(undefined)
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Failed to load slots')
     } finally {
       setIsFetching(false)
     }
   }
 
   const handleBook = async () => {
-    if (!selected) return
+    if (!doctorId || !selected) return
     try {
       await bookAppointment(doctorId, selected)
       alert('Booked!')
       fetchSlots()
-    } catch (e: any) {
-      alert(e?.response?.data?.message || 'Failed')
+    } catch (err: any) {
+      alert(err?.response?.data?.message || 'Failed')
     }
   }
 
@@ -39,13 +55,19 @@ export default function PatientBook() {
       <h1 className="text-xl font-semibold">Book an appointment</h1>
 
       <div className="flex items-center gap-2">
-        <label className="text-sm">Doctor ID</label>
-        <Input
-          type="number"
-          value={doctorId}
-          onChange={(e) => setDoctorId(parseInt(e.target.value || '0'))}
-          className="w-32"
-        />
+        <label className="text-sm">Doctor</label>
+        <select
+          className="border rounded px-3 py-2 w-64"
+          value={doctorId ?? ''}
+          onChange={(e) => setDoctorId(parseInt(e.target.value))}
+        >
+          {doctors.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </select>
+
         <Button onClick={fetchSlots} disabled={!doctorId || isFetching}>
           {isFetching ? 'Loading...' : 'Load slots'}
         </Button>
@@ -53,10 +75,12 @@ export default function PatientBook() {
 
       {slots.length > 0 ? (
         <div className="space-y-2">
-          <h2 className="font-medium">Available slots for doctor #{doctorId}</h2>
+          <h2 className="font-medium">
+            Available slots for {doctors.find((d) => d.id === doctorId)?.name}
+          </h2>
           <select
             className="border rounded px-3 py-2"
-            value={selected}
+            value={selected ?? ''}
             onChange={(e) => setSelected(parseInt(e.target.value))}
           >
             <option value="">Select a slot</option>

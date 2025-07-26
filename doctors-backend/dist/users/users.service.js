@@ -13,6 +13,7 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const bcrypt = require("bcrypt");
 const prisma_service_1 = require("../prisma/prisma.service");
+const role_enum_1 = require("./enums/role.enum");
 let UsersService = class UsersService {
     prisma;
     constructor(prisma) {
@@ -32,6 +33,13 @@ let UsersService = class UsersService {
     }
     findById(id) {
         return this.prisma.user.findUnique({ where: { id } });
+    }
+    async findAllDoctors() {
+        return this.prisma.user.findMany({
+            where: { role: role_enum_1.Role.DOCTOR },
+            select: { id: true, name: true },
+            orderBy: { name: 'asc' },
+        });
     }
 };
 exports.UsersService = UsersService;
