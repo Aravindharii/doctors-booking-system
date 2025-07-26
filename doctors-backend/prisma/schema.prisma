@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  DOCTOR
+  PATIENT
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(PATIENT)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // relations
+  doctorSlots  TimeSlot[]    @relation("DoctorSlots")
+  asDoctor     Appointment[] @relation("DoctorAppointments")
+  asPatient    Appointment[] @relation("PatientAppointments")
+}
+
+model TimeSlot {
+  id        Int        @id @default(autoincrement())
+  doctorId  Int
+  doctor    User       @relation("DoctorSlots", fields: [doctorId], references: [id])
+  start     DateTime
+  end       DateTime
+  isBooked  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  appointments Appointment[]
+}
+
+model Appointment {
+  id         Int                @id @default(autoincrement())
+  patientId  Int
+  doctorId   Int
+  slotId     Int
+  status     AppointmentStatus  @default(PENDING)
+
+  patient    User       @relation("PatientAppointments", fields: [patientId], references: [id])
+  doctor     User       @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  slot       TimeSlot   @relation(fields: [slotId], references: [id])
+
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
