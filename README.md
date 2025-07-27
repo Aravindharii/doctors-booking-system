@@ -143,7 +143,7 @@ The frontend will run on **http://localhost:5173**.
 
 ---
 
-## 🧪 Cypress Test Suite
+##  Cypress Test Suite
 
 ### Run Cypress in Interactive Mode
 ```
@@ -181,7 +181,7 @@ The Cypress tests cover:
 
 ---
 
-## ☁ AWS Lambda Deployment
+##  AWS Lambda Deployment
 
 We use the **Serverless Framework** to deploy the backend to AWS Lambda.
 
