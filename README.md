@@ -106,8 +106,10 @@ cp .env.example .env
 ```
 Update `.env` with your database and JWT secret:
 ```
-DATABASE_URL="postgresql://<user>:<password>@localhost:5432/doctors_booking"
-JWT_SECRET="your-secret-key"
+DATABASE_URL="postgresql://postgres:admin@localhost:5432/doctors_backend?schema=public"
+JWT_SECRET=supersecret
+JWT_EXPIRES_IN=7d
+
 ```
 
 ---
